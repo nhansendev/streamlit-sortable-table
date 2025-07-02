@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST.in
+setup.py
+sortable_table/__init__.py
+sortable_table/example.py
+sortable_table/frontend/build/bootstrap.min.css
+sortable_table/frontend/build/index.html
+sortable_table/frontend/build/assets/index-CFPMF26w.js
+streamlit_sortable_table.egg-info/PKG-INFO
+streamlit_sortable_table.egg-info/SOURCES.txt
+streamlit_sortable_table.egg-info/dependency_links.txt
+streamlit_sortable_table.egg-info/requires.txt
+streamlit_sortable_table.egg-info/top_level.txt
