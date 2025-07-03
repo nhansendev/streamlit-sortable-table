@@ -15,6 +15,7 @@ if "sort_col" not in st.session_state:
     st.session_state.sort_dir = "asc"
     st.session_state.page = 0
     st.session_state.rerun_flag = False
+    st.session_state.retrigger = 0
 
 # Sort DataFrame before sending it back
 if st.session_state.sort_col:
@@ -30,8 +31,10 @@ data = data.iloc[
 ]
 
 # Apply formatting
-data["Qty"] = data["Qty"].apply(lambda x: f"{x:.2f}").astype(str)
+data["Qty"] = data["Qty"].apply(lambda x: f"{x:.5f}").astype(str)
 data["Rating (W)"] = data["Rating (W)"].apply(lambda x: f"{x:.3f}").astype(str)
+
+st.session_state.retrigger = not st.session_state.retrigger
 
 # Show the component and capture sort interaction
 sort_event = sortable_table(
@@ -41,7 +44,10 @@ sort_event = sortable_table(
     page=st.session_state.page,
     max_page=int(len(df) / PAGE_SIZE) + 1,
     column_widths=["10%", "30%", 100, 200, 100],
-    key="custom_df",
+    retrigger=st.session_state.retrigger,
+    max_height="300px",
+    style_overrides="--table-font-size: 15px;",
+    key=f"custom_df",
 )
 
 sortable_table(

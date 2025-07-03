@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 import streamlit.components.v1 as components
 
 # Create a _RELEASE constant. We'll set this to False while we're developing
@@ -18,13 +17,16 @@ else:
 
 
 def sortable_table(
-    data: pd.DataFrame,
+    data,
     sort_column: str = None,
     sort_direction: str = "asc",
     paginated: bool = True,
     page: int = 0,
     max_page: int = 99999,
     column_widths: list | None = None,
+    retrigger: bool = False,
+    max_height: str = "600px",
+    style_overrides: str = "",
     key=None,
 ):
     """
@@ -45,6 +47,7 @@ def sortable_table(
                 or None if nothing was clicked.
         int: The current page number (if changed by user).
     """
+
     # Convert DataFrame to ArrowTable (Streamlit handles this automatically)
     result = _sortable_table(
         data=data,
@@ -54,8 +57,10 @@ def sortable_table(
         currentPage=page,
         maxPage=max_page,
         columnWidths=column_widths or [],
+        retrigger=retrigger,
+        maxHeight=max_height,
+        styleOverrides=style_overrides,
         key=key,
-        default=page,
     )
 
     # Always return a dict with both page and sort

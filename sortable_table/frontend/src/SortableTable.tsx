@@ -18,11 +18,13 @@ interface TableProps {
   initialPage?: number
   paginated?: boolean
   columnWidths?: (number | string)[]
+  maxHeight?: string
+  styleOverrides?: React.CSSProperties
 }
 
 const DEFAULT_MAX_PAGE = 99999
 
-const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, initialPage = 0 , paginated=true, columnWidths }) => {
+const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, initialPage = 0 , paginated=true, columnWidths, maxHeight='600px', styleOverrides}) => {
   // State for current page, initialized from props or 0
   const [page, setPage] = useState(initialPage)
 
@@ -51,6 +53,19 @@ const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, init
     }
   }
 
+  function parseStyleOverrides(styleOverrides?: string): Record<string, string> {
+    if (!styleOverrides) return {};
+    return styleOverrides
+      .split(";")
+      .map(s => s.trim())
+      .filter(Boolean)
+      .reduce((acc, curr) => {
+        const [key, value] = curr.split(":").map(s => s.trim());
+        if (key && value) acc[key] = value;
+        return acc;
+      }, {} as Record<string, string>);
+    }
+
   // Table metadata
   const table = element
   const hasHeader = table.headerRows > 0
@@ -62,7 +77,9 @@ const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, init
 
   return (
     <>
-      <div className="streamlit-table stDataFrame">
+      <div className="streamlit-table stDataFrame"
+      style={parseStyleOverrides(styleOverrides as any)}
+      >
         {/* Inline CSS for theming and table styling */}
         <style>
           {`
@@ -75,6 +92,7 @@ const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, init
               --highlight-color:rgb(0, 0, 0);
               --highlight-bg:rgb(211, 211, 211);
               --border-color:rgb(56, 56, 56);
+              --font-size: 12px;
             }
 
             @media (prefers-color-scheme: dark) {
@@ -87,6 +105,7 @@ const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, init
                 --highlight-color:rgb(255, 255, 255);
                 --highlight-bg:rgb(61, 61, 61);
                 --border-color:rgb(61, 61, 61);
+                --font-size: 12px;
               }
             }
             
@@ -97,11 +116,11 @@ const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, init
               background-color: var(--body-bg);
               border none;
               font-family: var(--font);
+              font-size: var(--font-size);
             }
 
             .stDataFrameContainer {
               overflow-x: auto;
-              max-height: 500px;
               overflow-y: auto;
               border-radius: 12px;
               border: 1px solid var(--border-color);
@@ -123,6 +142,7 @@ const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, init
               font-size: 14px;
               text-align: left;
               color: var(--body-color);
+              font-size: var(--font-size);
             }
 
             thead th:hover {
@@ -150,11 +170,15 @@ const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, init
             tbody tr:hover td {
               color: var(--highlight-color);
             }
+
+            .pagination-footer, .pagination-footer * {
+              font-size: var(--font-size);
+            }
           `}
         </style>
 
         {/* Table container with scroll and rounded corners */}
-        <div className="stDataFrameContainer" style={{ overflowX: "auto", maxHeight: "500px", overflowY: "auto" }}>
+        <div className="stDataFrameContainer" style={{ overflowX: "auto", maxHeight: maxHeight, overflowY: "auto" }}>
           <table
             id={id}
             className="table"
@@ -197,7 +221,7 @@ const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, init
         </div>
         {/* Pagination footer (external control) */}
         {paginated && (
-          <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginTop: 8 }}>
+          <div className="pagination-footer" style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", marginTop: 8 }}>
             <button onClick={() => setPage(0)} disabled={page === 0}>&laquo;</button>
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0} style={{ marginLeft: 4 }}>&lsaquo;</button>
             <span style={{ margin: "0 8px" }}>
@@ -336,6 +360,8 @@ const SortableTable: React.FC<ComponentProps> = (props) => {
       initialPage={props.args.initialPage}
       paginated={props.args.paginated}
       columnWidths={props.args.columnWidths}
+      maxHeight={props.args.maxHeight}
+      styleOverrides={props.args.styleOverrides}
     />
   )
 }
