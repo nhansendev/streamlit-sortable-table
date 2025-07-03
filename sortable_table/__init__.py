@@ -21,7 +21,6 @@ def sortable_table(
     sort_column: str = None,
     sort_direction: str = "asc",
     paginated: bool = True,
-    page: int = 0,
     max_page: int = 99999,
     column_widths: list | None = None,
     retrigger: bool = False,
@@ -38,7 +37,6 @@ def sortable_table(
         sort_column (str, optional): Column to sort by.
         sort_direction (str, optional): "asc" or "desc".
         paginated (bool, optional): Show the pagination controls
-        page (int, optional): Current page number (0-based).
         max_page (int, optional): Maximum number of pages.
         column_widths (list, optional): set the widths of each column using pixels, CSS, etc.
         retrigger (bool, optional): toggle to trigger a frontend update
@@ -59,7 +57,6 @@ def sortable_table(
         sortColumn=sort_column,
         sortDirection=sort_direction,
         paginated=paginated,
-        currentPage=page,
         maxPage=max_page,
         columnWidths=column_widths or [],
         retrigger=retrigger,
@@ -72,5 +69,5 @@ def sortable_table(
     # Always return a dict with both page and sort
     if isinstance(result, dict) and "page" in result:
         return result
-    # If backend returns only int (legacy), wrap it
-    return {"page": result if isinstance(result, int) else page, "sort": None}
+    # If backend returns only int, wrap it
+    return {"page": result, "sort": None}

@@ -36,13 +36,17 @@ data["Rating (W)"] = data["Rating (W)"].apply(lambda x: f"{x:.3f}").astype(str)
 
 st.session_state.retrigger = not st.session_state.retrigger
 
+mx = int(len(df) / PAGE_SIZE) + 1
+pge = st.number_input("Page:", 1, mx, mx)
+max_page = pge
+print(max_page)
+
 # Show the component and capture sort interaction
 sort_event = sortable_table(
     data=data,
     sort_column=st.session_state.sort_col,
     sort_direction=st.session_state.sort_dir,
-    page=st.session_state.page,
-    max_page=int(len(df) / PAGE_SIZE) + 1,
+    max_page=max_page,
     column_widths=["10%", "30%", 100, 200, 100],
     retrigger=st.session_state.retrigger,
     max_height="300px",
@@ -57,6 +61,8 @@ sortable_table(
 sortable_table(
     data=pd.DataFrame({"Data": list(range(10)), "Data2": list(range(10))}), key="test2"
 )
+
+print("Ret:", sort_event["page"])
 
 if st.session_state.page != sort_event["page"]:
     st.session_state.page = sort_event["page"]

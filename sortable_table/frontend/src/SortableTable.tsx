@@ -38,6 +38,13 @@ const Table: React.FC<TableProps> = ({
   // State for current page, initialized from props or 0
   const [page, setPage] = useState(initialPage)
 
+  // If page would exceed maxPage, reset to 0
+  useEffect(() => {
+    if (page >= maxPage) {
+      setPage(0)
+    }
+  }, [page, maxPage])
+
   // State to keep track of current sort column and direction
   const [sortState, setSortState] = useState<{ column: string; direction: "asc" | "desc" } | null>(null)
 
@@ -392,7 +399,6 @@ const SortableTable: React.FC<ComponentProps> = (props) => {
     <Table
       element={props.args.data}
       maxPage={props.args.maxPage}
-      initialPage={props.args.initialPage}
       paginated={props.args.paginated}
       columnWidths={props.args.columnWidths}
       maxHeight={props.args.maxHeight}
