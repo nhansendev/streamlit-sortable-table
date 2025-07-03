@@ -14,6 +14,8 @@ Please let me know of any obvious improvements can be made.
 - Override style settings with "style_overrides"
 
 ## Usage
+The component depends on the consistent memory of session states to keep track of page and sort parameters.
+
 Recommended session states:
 - st.session_state.sort_params
   - Tracks the `["sorted column", "asc" | "desc"]` pair
