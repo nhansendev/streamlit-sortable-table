@@ -47,6 +47,7 @@ sort_event = sortable_table(
     retrigger=st.session_state.retrigger,
     max_height="300px",
     style_overrides="--table-font-size: 15px;",
+    cell_tooltips={"Qty": ("A\nB\nC\n" + data["Qty"]).tolist()},
     key=f"custom_df",
 )
 

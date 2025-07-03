@@ -27,6 +27,7 @@ def sortable_table(
     retrigger: bool = False,
     max_height: str = "600px",
     style_overrides: str = "",
+    cell_tooltips: dict | None = None,
     key=None,
 ):
     """
@@ -40,6 +41,10 @@ def sortable_table(
         page (int, optional): Current page number (0-based).
         max_page (int, optional): Maximum number of pages.
         column_widths (list, optional): set the widths of each column using pixels, CSS, etc.
+        retrigger (bool, optional): toggle to trigger a frontend update
+        max_height: (str, optional): Limits the max height of the table
+        style_overrides: (str, optional): set style values to override defaults
+        cell_tooltips: (dict, optional): Add tooltips in the format {col: [row1, row2, ...]}
         key: Streamlit component key.
 
     Returns:
@@ -60,6 +65,7 @@ def sortable_table(
         retrigger=retrigger,
         maxHeight=max_height,
         styleOverrides=style_overrides,
+        cellTooltips=cell_tooltips or {},
         key=key,
     )
 

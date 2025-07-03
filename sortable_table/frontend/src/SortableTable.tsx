@@ -20,11 +20,21 @@ interface TableProps {
   columnWidths?: (number | string)[]
   maxHeight?: string
   styleOverrides?: React.CSSProperties
+  cellTooltips?: Record<string, string[]> // <-- Add this line
 }
 
 const DEFAULT_MAX_PAGE = 99999
 
-const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, initialPage = 0 , paginated=true, columnWidths, maxHeight='600px', styleOverrides}) => {
+const Table: React.FC<TableProps> = ({
+  element,
+  maxPage = DEFAULT_MAX_PAGE,
+  initialPage = 0,
+  paginated = true,
+  columnWidths,
+  maxHeight = '600px',
+  styleOverrides,
+  cellTooltips // <-- Add this line
+}) => {
   // State for current page, initialized from props or 0
   const [page, setPage] = useState(initialPage)
 
@@ -78,7 +88,7 @@ const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, init
   return (
     <>
       <div className="streamlit-table stDataFrame"
-      style={parseStyleOverrides(styleOverrides as any)}
+        style={parseStyleOverrides(styleOverrides as any)}
       >
         {/* Inline CSS for theming and table styling */}
         <style>
@@ -202,16 +212,24 @@ const Table: React.FC<TableProps> = ({ element, maxPage = DEFAULT_MAX_PAGE, init
             )}
             {hasHeader && (
               <thead>
-                {/* Remove formatCell prop */}
-                <TableRows isHeader={true} table={table} sortState={sortState ?? undefined} onSort={handleSort} />
+                <TableRows
+                  isHeader={true}
+                  table={table}
+                  sortState={sortState ?? undefined}
+                  onSort={handleSort}
+                />
               </thead>
             )}
             <tbody>
               {hasData ? (
-                // Remove formatCell prop
-                <TableRows isHeader={false} table={table} />
+                <TableRows
+                  isHeader={false}
+                  table={table}
+                  sortState={sortState ?? undefined}
+                  onSort={handleSort}
+                  cellTooltips={cellTooltips} // <-- Pass to TableRows
+                />
               ) : (
-                // Show "empty" if no data
                 <tr>
                   <td colSpan={table.columns || 1}>empty</td>
                 </tr>
@@ -242,6 +260,7 @@ interface TableRowsProps {
   table: ArrowTable
   sortState?: { column: string; direction: "asc" | "desc" }
   onSort?: (column: string) => void
+  cellTooltips?: Record<string, string[]> // <-- Add this line
 }
 
 interface TableRowProps {
@@ -249,11 +268,12 @@ interface TableRowProps {
   table: ArrowTable
   sortState?: { column: string; direction: "asc" | "desc" }
   onSort?: (column: string) => void
+  cellTooltips?: Record<string, string[]> // <-- Add this line
 }
 
 // Update TableRows and TableRow to not expect formatCell
 const TableRows: React.FC<TableRowsProps> = (props) => {
-  const { isHeader, table, sortState, onSort } = props
+  const { isHeader, table, sortState, onSort, cellTooltips } = props
   const { headerRows, rows } = table
   const startRow = isHeader ? 0 : headerRows
   const endRow = isHeader ? headerRows : rows
@@ -266,6 +286,7 @@ const TableRows: React.FC<TableRowsProps> = (props) => {
         table={table}
         sortState={sortState}
         onSort={onSort}
+        cellTooltips={cellTooltips} // <-- Pass to TableRow
       />
     </tr>
   ))
@@ -279,11 +300,12 @@ interface TableRowProps {
   table: ArrowTable
   sortState?: { column: string; direction: "asc" | "desc" }
   onSort?: (column: string) => void
+  cellTooltips?: Record<string, string[]> // <-- Add this line
 }
 
 // Renders a single table row (header or data)
 const TableRow: React.FC<TableRowProps> = (props) => {
-  const { rowIndex, table, sortState, onSort } = props
+  const { rowIndex, table, sortState, onSort, cellTooltips } = props
   const { columns } = table
 
   // Exclude index column, accounting for empty dataframes
@@ -306,6 +328,14 @@ const TableRow: React.FC<TableRowProps> = (props) => {
     // Determine if this column is currently sorted
     const isSorted = sortState?.column === colName
     const arrow = isSorted ? (sortState?.direction === "asc" ? " ▲" : " ▼") : " ▲▼"
+
+    // Only apply tooltips for data cells (not header)
+    let cellTooltip: string | undefined = undefined
+    if (type === "data" && cellTooltips && cellTooltips[colName]) {
+      // rowIndex is absolute, so subtract headerRows to get data row index
+      const dataRowIdx = rowIndex - (table.headerRows || 0)
+      cellTooltip = cellTooltips[colName][dataRowIdx]
+    }
 
     switch (type) {
       case "blank":
@@ -333,7 +363,12 @@ const TableRow: React.FC<TableRowProps> = (props) => {
       case "data":
         // Render data cell
         return (
-          <td key={columnIndex} id={id} className={classNames}>
+          <td
+            key={columnIndex}
+            id={id}
+            className={classNames}
+            title={cellTooltip ?? ""}
+          >
             {formattedContent}
           </td>
         )
@@ -362,6 +397,7 @@ const SortableTable: React.FC<ComponentProps> = (props) => {
       columnWidths={props.args.columnWidths}
       maxHeight={props.args.maxHeight}
       styleOverrides={props.args.styleOverrides}
+      cellTooltips={props.args.cellTooltips} // <-- Add this line
     />
   )
 }
