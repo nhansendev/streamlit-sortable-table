@@ -42,7 +42,6 @@ def main_table(df, max_page):
         data=df, # a dataframe
         sort_column=sort_col,
         sort_direction=sort_dir,
-        page=st.session_state.page + 1,
         max_page=max_page,
         column_widths=[
             "5%",
