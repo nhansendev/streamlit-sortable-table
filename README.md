@@ -101,12 +101,12 @@ def sortable_table(
     sort_column: str = None,
     sort_direction: str = "asc",
     paginated: bool = True,
-    page: int = 0,
     max_page: int = 99999,
     column_widths: list | None = None,
     retrigger: bool = False,
     max_height: str = "600px",
     style_overrides: str = "",
+    cell_tooltips: dict | None = None,
     key=None,
 ):
     """
@@ -117,17 +117,17 @@ def sortable_table(
         sort_column (str, optional): Column to sort by.
         sort_direction (str, optional): "asc" or "desc".
         paginated (bool, optional): Show the pagination controls
-        page (int, optional): Current page number (0-based).
         max_page (int, optional): Maximum number of pages.
         column_widths (list, optional): set the widths of each column using pixels, CSS, etc.
         retrigger (bool, optional): toggle to trigger a frontend update
         max_height: (str, optional): Limits the max height of the table
         style_overrides: (str, optional): set style values to override defaults
+        cell_tooltips: (dict, optional): Add tooltips in the format {col: [row1, row2, ...]}
         key: Streamlit component key.
 
     Returns:
-        int: The current page number,
-        dict: {"column": str, "direction": "asc" | "desc"} when a column header is sorted,
-                or None if nothing is sorted.
+        dict: {"column": str, "direction": "asc" | "desc"} when a column header is clicked,
+                or None if nothing was clicked.
+        int: The current page number (if changed by user).
     """
 ```
